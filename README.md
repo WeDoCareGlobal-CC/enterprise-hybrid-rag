@@ -4,6 +4,8 @@ Hybrid RAG pipeline combining NVIDIA NeMo Retriever + custom embeddings,
 multi-modal retrieval (text + image + structured data), production deployment
 with Docker Compose, and a continuous evaluation layer.
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22945802.svg)](https://doi.org/10.5281/zenodo.22945802)
+
 ## Features
 
 - NeMo Retriever — GPU-accelerated embedding and retrieval via NVIDIA NIM
