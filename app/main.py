@@ -1,5 +1,4 @@
-"""
-FastAPI service for Enterprise Hybrid RAG with SSE streaming.
+"""FastAPI service for Enterprise Hybrid RAG with SSE streaming.
 
 Exposes /query endpoint that streams tokenized answers using
 Server-Sent Events (SSE) with time-to-first-token under 450ms.
@@ -10,11 +9,23 @@ import json
 import time
 from typing import AsyncGenerator, Optional
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Response, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
+from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
+from prometheus_client import CollectorRegistry, REGISTRY
 
 from app.retriever import EnterpriseHybridRetriever
+
+
+# Prometheus metrics
+from prometheus_client import REGISTRY
+
+REQUEST_COUNT = Counter("http_requests_total", "Total HTTP requests", ["method", "endpoint", "status"])
+REQUEST_LATENCY = Histogram("http_request_duration_seconds", "HTTP request latency", ["method", "endpoint"])
+QUERY_COUNT = Counter("rag_queries_total", "Total RAG queries", ["type", "status"])
+QUERY_DURATION = Histogram("rag_query_duration_seconds", "RAG query duration", ["type"])
+RETRIEVAL_DURATION = Histogram("rag_retrieval_duration_seconds", "Retrieval duration", ["method"])
 
 
 # ---------------------------------------------------------------------------
@@ -204,8 +215,27 @@ async def root() -> dict:
             "GET /health": "Health check",
             "POST /query": "Execute retrieval (JSON response)",
             "GET /query/stream": "Execute retrieval (SSE streaming)",
+            "GET /metrics": "Prometheus metrics",
         },
     }
+
+
+@app.get("/metrics")
+async def metrics() -> Response:
+    """Prometheus metrics endpoint."""
+    return Response(content=generate_latest(), media_type=CONTENT_TYPE_LATEST)
+
+
+# Middleware for metrics
+@app.middleware("http")
+async def metrics_middleware(request: Request, call_next):
+    import time
+    start_time = time.time()
+    response = await call_next(request)
+    duration = time.time() - start_time
+    REQUEST_COUNT.labels(method=request.method, endpoint=request.url.path, status=response.status_code).inc()
+    REQUEST_LATENCY.labels(method=request.method, endpoint=request.url.path).observe(duration)
+    return response
 
 
 # ---------------------------------------------------------------------------
