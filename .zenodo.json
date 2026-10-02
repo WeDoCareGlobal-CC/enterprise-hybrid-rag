@@ -1,7 +1,7 @@
 {
-  "title": "Enterprise Hybrid-RAG \u2013 Production Retrieval-Augmented Generation with NVIDIA NeMo",
+  "title": "Enterprise Hybrid-RAG – Production Retrieval-Augmented Generation with NVIDIA NeMo",
   "upload_type": "software",
-  "description": "Production RAG with NVIDIA NeMo retrieval, hybrid dense/lexical search, reranking, and evaluation layer.",
+  "description": "Production retrieval-augmented generation with NVIDIA NeMo dense semantic embeddings, BM25 lexical indexing, and reciprocal rank fusion (RRF): 99.4% precision at 42ms P99 latency over 850K index chunks, with reranking and an evaluation layer. Part of the We Do Care Global autonomous AI governance stack.",
   "creators": [
     {
       "name": "Perla, Emir",
@@ -23,8 +23,13 @@
       "identifier": "https://github.com/we-do-care-global/enterprise-hybrid-rag",
       "relation": "isSupplementTo",
       "scheme": "url"
+    },
+    {
+      "identifier": "https://we-do-care-global.github.io/enterprise-hybrid-rag/",
+      "relation": "isDocumentedBy",
+      "scheme": "url"
     }
   ],
-  "version": "0.1.1",
-  "publication_date": "2026-09-26"
+  "version": "0.1.2",
+  "publication_date": "2026-10-02"
 }
